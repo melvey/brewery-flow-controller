@@ -47,4 +47,5 @@ void onRelease() {
 void onTap() {
   Serial.print("Tap");
   toggleFlow();
+  turnOffAfter(300);
 }
