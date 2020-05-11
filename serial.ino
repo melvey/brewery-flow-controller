@@ -1,9 +1,9 @@
-char[] deviceId = "FL01";
+char deviceId[] = "FL01";
 
 char marker = ';';
-char[] toggleAction = ['O','N']; // Value is 0 or 1
-char[] setLimitAction = ['L', 'M']; // Value is the limit in ml
-char[] turnOnForLimit = ['L','O']; // Value is the limit in ml
+char toggleAction[] = "ON"; // Value is 0 or 1
+char setLimitAction[] = "LM"; // Value is the limit in ml
+char turnOnForLimit[] = "LO"; // Value is the limit in ml
 
 // Format :DDDDAAVVVV:
 // : indicates start/end
@@ -13,19 +13,21 @@ char[] turnOnForLimit = ['L','O']; // Value is the limit in ml
 
 void readSerial() {
 
-	char[] command = char[2];
+	char command[2];
 	
-	char readByte = null;
+	char readByte[1];
 	while(Serial.readBytes(readByte, 1) > 0)
-		if(readByte = marker && Serial.peek() != marker) {
-			char[] incomingID = char[4];
-			char[] incomingAction = char[2];
-			union incomingValue
+		if(readByte == marker && Serial.peek() != marker) {
+			char incomingId[4];
+			char incomingAction[2];
+			union LongByte
 			{
 				 unsigned long value;
 				 byte bytes[4];
 			};
+      LongByte incomingValue;
 
+      
 			Serial.readBytes(incomingId, 4);
 			if(strcmp(incomingId, deviceId) != 0) {
 				return;
@@ -33,31 +35,25 @@ void readSerial() {
 
 			Serial.readBytes(incomingAction, 2);
 
-			if(strCmp(incomingAction, toggleAction) == 0) {
+			if(strcmp(incomingAction, toggleAction) == 0) {
 				Serial.readBytes(incomingValue.bytes, 4);
 				if(incomingValue.value > 0) {
 					// turn on
-					openValve();
+					openFlow();
 				} else {
 					// turn off
-					closeValve();
+					closeFlow();
 				}
-				return;
-			}
-			if(strCmp(incomingAction, setLimitAction == 0) {
+			} else if(strcmp(incomingAction, setLimitAction) == 0) {
 				Serial.readBytes(incomingValue.bytes, 4);
 				turnOffAfter(incomingValue.value);
-				return;
-			}
-			if(strCmp(incomingAction, turnOnForLimit == 0) {
+			} else if(strcmp(incomingAction, turnOnForLimit) == 0) {
 				Serial.readBytes(incomingValue.bytes, 4);
 				turnOffAfter(incomingValue.value);
-				openValve();
-				return
+				openFlow();
 			}
 
 		}
 		// discard unexpected data
-	}
 	
 }
