@@ -16,6 +16,74 @@ char endMarker = 0x03;
 // AA is action code
 // VVVV is the value
 
+void sendStatus(bool isOpen, float rate, unsigned int totalVolume, unsigned int volumeLimit, unsigned int tempVolume) {
+  // format ;DDDD:TTTT:1:2222:3333:4444:5555;
+  union LongByte
+  {
+     unsigned long value;
+     byte bytes[4];
+  };
+  union IntByte
+  {
+     unsigned int value;
+     byte bytes[4];
+  };
+  union FloatByte
+  {
+     float value;
+     byte bytes[4];
+  };
+
+  LongByte now;
+  now.value = millis();
+
+
+  FloatByte rateBytes;
+  rateBytes.value = rate;
+
+  
+  char message[33];
+
+
+
+  message[0] = marker;
+  message[1] = deviceId[0];
+  message[2] = deviceId[1];
+  message[3] = deviceId[2];
+  message[4] = deviceId[3];
+  message[5] = seperator;
+  message[6] = now.bytes[0];
+  message[7] = now.bytes[1];
+  message[8] = now.bytes[2];
+  message[9] = now.bytes[4];
+  message[10] = seperator;
+  message[11] = isOpen ? 1 : 0;
+  message[12] = seperator;
+  message[13] = rateBytes.bytes[0];
+  message[14] = rateBytes.bytes[1];
+  message[15] = rateBytes.bytes[2];
+  message[16] = rateBytes.bytes[3];
+  message[17] = seperator;
+  message[18] = (totalVolume >> 24) & 0xFF;
+  message[19] = (totalVolume >> 16) & 0xFF;
+  message[20] = (totalVolume >> 8) & 0xFF;
+  message[21] = totalVolume & 0xFF;
+  message[22] = seperator;
+  message[23] = (volumeLimit >> 24) & 0xFF;
+  message[24] = (volumeLimit >> 16) & 0xFF;
+  message[25] = (volumeLimit >> 8) & 0xFF;
+  message[26] = volumeLimit & 0xFF;
+  message[27] = seperator;
+  message[28] = (tempVolume >> 24) & 0xFF;
+  message[29] = (tempVolume >> 16) & 0xFF;
+  message[30] = (tempVolume >> 8) & 0xFF;
+  message[31] = tempVolume & 0xFF;
+  message[32] = marker;
+
+  Serial.write(message);
+  Serial.print(message);
+}
+
 
 void readSerial() {
 

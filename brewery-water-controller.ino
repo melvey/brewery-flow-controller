@@ -18,6 +18,7 @@ void setup() {
   pinMode(flowPin, INPUT);
   loopRunTime = millis(); // A bit moot but it keeps our initial delta accurate
   enableFlow();
+  sendStatus(0, 0, 0, 0, 0);
 
 }
 
