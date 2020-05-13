@@ -1,23 +1,23 @@
-float isOpen = 0;
+bool isOpen = false;
 
 void openFlow() {
-  if(isOpen == 0) {
+  if(isOpen == false) {
     Serial.print("Open flow\n");
     digitalWrite(solenoidPin, HIGH);
-    isOpen = 1;
+    isOpen = true;
   }
 }
 
 void closeFlow() {
-  if(isOpen == 1) {
+  if(isOpen == true) {
     Serial.print("Close flow\n");
     digitalWrite(solenoidPin, LOW);
-    isOpen = 0;
+    isOpen = false;
   }
 }
 
 void toggleFlow() {
-  if(isOpen == 0) {
+  if(isOpen == false) {
     openFlow();
   } else {
     closeFlow();

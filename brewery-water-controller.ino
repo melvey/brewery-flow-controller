@@ -26,6 +26,6 @@ void loop() {
    loopRunTime = millis();
    float deltaTime = loopRunTime - oldTime;
    handleButtonPress();
-   //calculateFlow();
+   readSerial();
 
 }
