@@ -16,9 +16,9 @@ void handleButtonPress() {
     }
     
     if(now - pressStart > holdTime) {
-      Serial.print("Holding:");
-      Serial.print(now - pressStart);
-      Serial.print("\n");
+//      Serial.print("Holding:");
+//      Serial.print(now - pressStart);
+ //     Serial.print("\n");
       holding = 1;
       onHold();
     }
@@ -35,17 +35,17 @@ void handleButtonPress() {
 
 
 void onHold() {
-  Serial.print("Holding");
+//  Serial.print("Holding");
   openFlow();
 }
 
 void onRelease() {
-  Serial.print("Released");
+//  Serial.print("Released");
   closeFlow();
 }
 
 void onTap() {
-  Serial.print("Tap");
+//  Serial.print("Tap");
   toggleFlow();
   turnOffAfter(300);
 }

@@ -2,9 +2,6 @@ const int sampleInterval = 1000;
 const float ticksPerLitres = 7.5; // 7.5 ticks per litres per hour
 long lastSampleTime = 0;
 volatile int flowTicks = 0;
-double totalVolume = 0;
-double tempVolume = 0; 
-int volumeLimit = 500;
 
 
 void enableFlow() {
@@ -30,7 +27,8 @@ void flowTick() {
       tempVolume += volume;
     }
 
-    Serial.print(String("FLOW:") + rate + ":" + totalVolume + ":" + volumeLimit + ":" + tempVolume + "\n");
+    sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
+//    Serial.print(String("FLOW:") + rate + ":" + totalVolume + ":" + volumeLimit + ":" + tempVolume + "\n");
 
     if(tempVolume >= volumeLimit) {
       closeFlow();
