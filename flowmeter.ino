@@ -28,16 +28,20 @@ void flowTick() {
     }
 
     sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
-//    Serial.print(String("FLOW:") + rate + ":" + totalVolume + ":" + volumeLimit + ":" + tempVolume + "\n");
 
     if(tempVolume >= volumeLimit) {
       closeFlow();
       tempVolume = 0;
       volumeLimit = 0;
+    } else {
+      // Update this to show process
+      showProgressAndFlow(tempVolume, volumeLimit, rate);
     }
 
     flowTicks = 0;
     lastSampleTime = now;
+  } else {
+    showVolumeAndFlow(totalVolume, rate);    
   }
 }
 

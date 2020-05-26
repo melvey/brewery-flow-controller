@@ -5,6 +5,7 @@ void openFlow() {
     digitalWrite(solenoidPin, HIGH);
     isOpen = true;
     sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
+    showVolumeAndStatus(totalVolume, isOpen);
   }
 }
 
@@ -14,6 +15,7 @@ void closeFlow() {
     digitalWrite(solenoidPin, LOW);
     isOpen = false;
     sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
+    showVolumeAndStatus(totalVolume, isOpen);
   }
 }
 
