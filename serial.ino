@@ -79,7 +79,8 @@ void readSerial() {
   char command[2];
 
   char readByte[1];
-  while (Serial.readBytes(readByte, 1) > 0) {
+  while (Serial.available()) {
+    Serial.readBytes(readByte, 1);
     Serial.print("Read: ");
     Serial.print(readByte[0]);
     Serial.print("?!\n");
@@ -132,5 +133,6 @@ void readSerial() {
     }
     // discard unexpected data
   }
-
+  
+  lastSerialRead = millis();
 }

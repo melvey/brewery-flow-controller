@@ -87,19 +87,17 @@ void showVolume(double totalVolume) {
 
 void showStatus(boolean isOpen) {
   int col = 0;
+  lcd.setCursor(0, 1);
   if(line2Display != statusMsg) {
-    lcd.setCursor(0, 1);
-    lcd.print("Valve ");    
+    col += lcd.print("Valve ");    
   } else {
     lcd.setCursor(6, 1);    
+    col = 6;
   }
-  col = 6;
   if(isOpen) {
-    lcd.print("Open");
-    col = col + 4;
+    col += lcd.print("Open");
   } else {
-    lcd.print("Closed");
-    col = col + 6;
+    col += lcd.print("Closed");
   }
   for(;col < lcdCols; col++) {
     lcd.print(" ");
@@ -110,18 +108,21 @@ void showStatus(boolean isOpen) {
 
 void showFlowRate(double rate) {
   int col = 0;
+  lcd.setCursor(0, 1);
   if(line2Display != rateMsg) {
-    lcd.setCursor(0, 1);
-    lcd.print("Rate: ");    
+    col += lcd.print("Rate: ");    
   } else {
     lcd.setCursor(5, 1);    
+    col = 5;
   }
-  col = 5;
 
-  int bytes = lcd.print(rate);
-  lcd.print("L/H");
-  col = col + bytes + 3;
+  col += lcd.print(rate);
+  col += lcd.print("L/H");
 
+  for(;col < lcdCols; col++) {
+    lcd.print(" ");
+  }
+  
   line1Display = rateMsg;  
   
 }
@@ -130,29 +131,22 @@ void showProgress(double progress, int limit) {
   // Print first line
   lcd.setCursor(0, 0);
   int col = 0;
-  int bytes;
   if(limit > 1000) {
     // Show litres
-    bytes = lcd.print(progress / 1000);
-    lcd.print("/");
-    col = col + bytes + 1;
-    bytes = lcd.print(limit / 1000);
-    lcd.print("L ");
-    col = col + bytes  + 2;
+    col += lcd.print(progress / 1000);
+    col += lcd.print("/");
+    col += lcd.print(limit / 1000);
+    col += lcd.print("L (");
   } else {
     // Show ml
-    bytes = lcd.print((int)progress);
-    lcd.print("/");
-    col = col + bytes + 1;
-    bytes = lcd.print(limit);
-    lcd.print("ml ");
-    col = col + bytes + 3;    
+    col += lcd.print((int)progress);
+    col += lcd.print("/");
+    col += lcd.print(limit);
+    col += lcd.print("ml (");
   }
   
-  lcd.print("(");
-  bytes = lcd.print(round(progress/limit * 100));
-  lcd.print("%)");
-  col = col + bytes + 3;
+  col += lcd.print(round(progress/limit * 100));
+  col += lcd.print("%)");
   
   for(;col < lcdCols; col++) {
     lcd.print(" ");
