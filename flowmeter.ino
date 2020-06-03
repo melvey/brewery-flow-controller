@@ -1,26 +1,24 @@
-const int sampleInterval = 1000;
 const float ticksPerLitres = 7.5; // 7.5 ticks per litres per hour
-long lastSampleTime = 0;
 volatile int flowTicks = 0;
-double totalVolume = 0;
-double tempVolume = 0; 
-int volumeLimit = 500;
 
 
 void enableFlow() {
   Serial.print("Track flow\n");
   flowTicks = 0;
-  attachInterrupt(0, flowTick, RISING); //and the interrupt is attached
+  attachInterrupt(digitalPinToInterrupt(flowPin), flowTick, CHANGE);
 //  sei();
 }
 
 void flowTick() {
   flowTicks++;
+    long now = millis();
+}
 
-  long now = millis();
-  if(now - lastSampleTime > sampleInterval) {
+boolean updateFlow() {
+  if(flowTicks > 0) {
+    long now = millis();
     long delta = now - lastSampleTime;
-    float secondsPassed = delta / 1000; // Get delta in seconds
+    float secondsPassed = (float)delta / (float)1000; // Get delta in seconds
 
     double rate = calculateFlowRate(flowTicks, secondsPassed);
     double volume = calculateVolume(rate, secondsPassed);
@@ -30,17 +28,15 @@ void flowTick() {
       tempVolume += volume;
     }
 
-    Serial.print(String("FLOW:") + rate + ":" + totalVolume + ":" + volumeLimit + ":" + tempVolume + "\n");
-
     if(tempVolume >= volumeLimit) {
       closeFlow();
       tempVolume = 0;
       volumeLimit = 0;
     }
-
     flowTicks = 0;
-    lastSampleTime = now;
+    return true;
   }
+  return false;
 }
 
 void turnOffAfter(long targetVolume) {

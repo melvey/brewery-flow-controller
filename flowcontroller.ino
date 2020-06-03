@@ -1,23 +1,26 @@
-float isOpen = 0;
 
 void openFlow() {
-  if(isOpen == 0) {
-    Serial.print("Open flow\n");
+  if(isOpen == false) {
+//    Serial.print("Open flow\n");
     digitalWrite(solenoidPin, HIGH);
-    isOpen = 1;
+    isOpen = true;
+    sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
+    showVolumeAndStatus(totalVolume, isOpen);
   }
 }
 
 void closeFlow() {
-  if(isOpen == 1) {
-    Serial.print("Close flow\n");
+  if(isOpen == true) {
+//    Serial.print("Close flow\n");
     digitalWrite(solenoidPin, LOW);
-    isOpen = 0;
+    isOpen = false;
+    sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
+    showVolumeAndStatus(totalVolume, isOpen);
   }
 }
 
 void toggleFlow() {
-  if(isOpen == 0) {
+  if(isOpen == false) {
     openFlow();
   } else {
     closeFlow();
