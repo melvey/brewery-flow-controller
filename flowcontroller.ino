@@ -26,3 +26,14 @@ void toggleFlow() {
     closeFlow();
   }
 }
+
+
+void openValve() {
+  analogWrite(valveOpenPin, 0);
+  analogWrite(valveClosePin, 255);
+}
+
+void closeValve() {
+  analogWrite(valveClosePin, 0);
+  analogWrite(valveOpenPin, 255);
+}

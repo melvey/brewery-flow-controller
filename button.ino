@@ -8,7 +8,7 @@ float lastPress = 0;
 void handleButtonPress() {
   int buttonState = digitalRead(buttonPin);
   float now = millis();
-  if(buttonState == HIGH) {
+  if(buttonState == LOW) {
     float now = millis();
     
     if(pressStart == 0) {
@@ -37,15 +37,16 @@ void handleButtonPress() {
 void onHold() {
 //  Serial.print("Holding");
   openFlow();
+  openValve();
 }
 
 void onRelease() {
 //  Serial.print("Released");
   closeFlow();
+  closeValve();
 }
 
 void onTap() {
-//  Serial.print("Tap");
+//  turnOffAfter(50000);
   toggleFlow();
-  turnOffAfter(300);
 }

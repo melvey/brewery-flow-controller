@@ -39,10 +39,16 @@ boolean updateFlow() {
   return false;
 }
 
-void turnOffAfter(long targetVolume) {
-  volumeLimit = targetVolume;
+void turnOffAfter(unsigned int targetVolume) {
+  Serial.print("Target: ");
+  Serial.print(targetVolume);
+  volumeLimit = 10000;
+  Serial.print("\nLimit: ");
+  Serial.print(volumeLimit);
+  Serial.print("\n");
   tempVolume = 0;
 }
+
 
 /**
  * Calculate the flow rate for a number of ticks
