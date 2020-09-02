@@ -113,7 +113,7 @@ void showStatus(boolean isOpen) {
   line1Display = statusMsg;  
 }
 
-void showFlowRate(double rate) {
+void showFlowRate(unsigned long rate) {
   int col = 0;
   lcd.setCursor(0, 1);
   if(line2Display != rateMsg) {
@@ -123,7 +123,9 @@ void showFlowRate(double rate) {
     col = 5;
   }
 
-  col += lcd.print(rate);
+  col += lcd.print(rate / 1000);
+  col += lcd.print(".");
+  col += lcd.print((rate / 100) % 10);
   col += lcd.print("L/H");
 
   for(;col < lcdCols; col++) {
@@ -167,12 +169,12 @@ void showVolumeAndStatus(unsigned long totalVolume, boolean isOpen) {
   showStatus(isOpen);
 }
 
-void showVolumeAndFlow(unsigned long totalVolume, double flow) {
+void showVolumeAndFlow(unsigned long totalVolume, unsigned long flow) {
   showVolume(totalVolume);
   showFlowRate(flow);
 }
 
-void showProgressAndFlow(unsigned long progress, unsigned int limit, double flow) {
+void showProgressAndFlow(unsigned long progress, unsigned int limit, unsigned long flow) {
   Serial.print("Show progress and flow\n");
   Serial.print(progress);
   showProgress(progress, limit);

@@ -1,4 +1,4 @@
-const float ticksPerLitres = 7.5; // 7.5 ticks per litres per hour
+const int ticksPerCl = 750; // 7.5 ticks per litres per hour
 volatile int flowTicks = 0;
 
 
@@ -11,17 +11,16 @@ void enableFlow() {
 
 void flowTick() {
   flowTicks++;
-    long now = millis();
+    unsigned long now = millis();
 }
 
 boolean updateFlow() {
   if(flowTicks > 0) {
-    long now = millis();
-    long delta = now - lastSampleTime;
-    float secondsPassed = (float)delta / (float)1000; // Get delta in seconds
+    unsigned long now = millis();
+    unsigned long delta = now - lastSampleTime;
 
-    double rate = calculateFlowRate(flowTicks, secondsPassed);
-    unsigned long volume = calculateVolume(rate, secondsPassed);
+    unsigned long rate = calculateFlowRate(flowTicks, delta);
+    unsigned long volume = calculateVolume(rate, delta);
     totalVolume += volume;
 
     if(volumeLimit > 0) {
@@ -53,24 +52,25 @@ void turnOffAfter(unsigned int targetVolume) {
 /**
  * Calculate the flow rate for a number of ticks
  * @param {long} ticks The number of ticks that have been recorded
- * @param {double} seconds The number of seconds the ticks were recorded in
- * @return {double} The flow rate in L/h
+ * @param {unsigned } delta The number of miliseconds the ticks were recorded in
+ * @return {unsigned long} The flow rate in mL/h
  */
-double calculateFlowRate(long ticks, double seconds) {
-    double flow = (ticks * 60.0 / ticksPerLitres) / seconds;
+unsigned long calculateFlowRate(long ticks, unsigned long delta) {  
+    unsigned long unitConversion = 100000000; // there are 100000 ml in a cl and 1000ms in a second
+    unsigned long flow = (ticks * unitConversion / ticksPerCl) / delta;
     return flow;  
 }
 
 /**
  * Calculate the volume of liquid from a flow rate
- * @param {double} flowRate the flow rate in L/h
- * @param {float} The number of seconds that have passed
+ * @param {unsigned long} flowRate the flow rate in mL/h
+ * @param {unisnged long} delta The number of miliseconds that have passed
+ * @param {unsgined long} The volume in ml
  */
-unsigned long calculateVolume(double flowRate, float seconds) {
-    double flowPerSecond = flowRate / 3600.0;
-    Serial.print("FPS:");
-    Serial.print(flowPerSecond);
-    unsigned long volume = flowPerSecond * seconds * 1000000; // Convert litres to mililitres
+unsigned long calculateVolume(unsigned long flowRate, unsigned long delta) {
+    Serial.print("FPMS:");
+    Serial.print(flowRate);
+    unsigned long volume = flowRate * delta ; // Convert litres to mililitres
     return volume;
 }
 
