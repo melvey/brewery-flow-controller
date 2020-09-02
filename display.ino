@@ -60,7 +60,10 @@ void printStartMessage() {
   line2Display = startMsg;
 }
 
-void showVolume(double totalVolume) {
+/**
+ * totalVolume: The total volume in microletres that has passed
+ */
+void showVolume(unsigned long totalVolume) {
   // Print first line
   int col = 0;
   if(line1Display != volumeMsg) {
@@ -71,11 +74,15 @@ void showVolume(double totalVolume) {
     col = 8;
   }
   
-  if(totalVolume < 1000) {
-     col += lcd.print(round(totalVolume));
+  if(totalVolume < 1000000) {
+    // convert microlitres to mililitres
+     col += lcd.print(totalVolume/1000);
      col += lcd.print("ml");
   } else {
-    col += lcd.print(round(totalVolume)/1000);
+    // Convert microlitres to litres with one decimal point
+    col += lcd.print(totalVolume/1000000);
+    col += lcd.print(".");
+    col += lcd.print((totalVolume/100000)%1000000);
     col += lcd.print("l");
   }
   for(;col < lcdCols; col++) {
@@ -127,7 +134,7 @@ void showFlowRate(double rate) {
   
 }
 
-void showProgress(double progress, int limit) {
+void showProgress(unsigned long progress, unsigned int limit) {
   // Print first line
   lcd.setCursor(0, 0);
   int col = 0;
@@ -155,17 +162,17 @@ void showProgress(double progress, int limit) {
   line1Display = progressMsg;  
 }
 
-void showVolumeAndStatus(double totalVolume, boolean isOpen) {
+void showVolumeAndStatus(unsigned long totalVolume, boolean isOpen) {
   showVolume(totalVolume);
   showStatus(isOpen);
 }
 
-void showVolumeAndFlow(double totalVolume, double flow) {
+void showVolumeAndFlow(unsigned long totalVolume, double flow) {
   showVolume(totalVolume);
   showFlowRate(flow);
 }
 
-void showProgressAndFlow(double progress, int limit, double flow) {
+void showProgressAndFlow(unsigned long progress, unsigned int limit, double flow) {
   Serial.print("Show progress and flow\n");
   Serial.print(progress);
   showProgress(progress, limit);

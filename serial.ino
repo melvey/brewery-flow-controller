@@ -37,7 +37,7 @@ union FloatByte
 /**
 
 */
-void sendStatus(bool isOpen, float rate, unsigned int totalVolume, unsigned int volumeLimit, unsigned int tempVolume) {
+void sendStatus(bool isOpen, float rate, unsigned long totalVolume, unsigned int volumeLimit, unsigned long tempVolume) {
   // format ;DDDDAATTTT12222333344445555;
 
   LongByte now;

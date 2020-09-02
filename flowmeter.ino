@@ -21,7 +21,7 @@ boolean updateFlow() {
     float secondsPassed = (float)delta / (float)1000; // Get delta in seconds
 
     double rate = calculateFlowRate(flowTicks, secondsPassed);
-    double volume = calculateVolume(rate, secondsPassed);
+    unsigned long volume = calculateVolume(rate, secondsPassed);
     totalVolume += volume;
 
     if(volumeLimit > 0) {
@@ -66,8 +66,11 @@ double calculateFlowRate(long ticks, double seconds) {
  * @param {double} flowRate the flow rate in L/h
  * @param {float} The number of seconds that have passed
  */
-double calculateVolume(double flowRate, float seconds) {
-    double volume = (flowRate / 3600.0) * seconds * 1000; // Convert litres to mililitres
+unsigned long calculateVolume(double flowRate, float seconds) {
+    double flowPerSecond = flowRate / 3600.0;
+    Serial.print("FPS:");
+    Serial.print(flowPerSecond);
+    unsigned long volume = flowPerSecond * seconds * 1000000; // Convert litres to mililitres
     return volume;
 }
 

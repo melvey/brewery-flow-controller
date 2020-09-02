@@ -10,10 +10,10 @@ const int updateInterval = 1000;
 // flowcontroller
 bool isOpen = false;  // Flag indicating if the solenoid (flow) is open
 // flowmeter
-double totalVolume = 0; // The total volume of liquid in ml that has passed
+unsigned long totalVolume = 0; // The total volume of liquid in microlitres that has passed
 double rate = 0;        // Flow rate in litres per hour (I think)
 unsigned int volumeLimit = 50000;  // Limit in ml of volume that will flow before it is closed
-double tempVolume = 0;  // The volume of water that has flowed when tracking the volumeLimit
+unsigned long tempVolume = 0;  // The volume of water that has flowed when tracking the volumeLimit
 
 // Throttling for flow samples
 long lastSampleTime = 0; // The last time the volume was sampled
