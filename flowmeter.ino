@@ -22,6 +22,7 @@ boolean updateFlow() {
     unsigned long rate = calculateFlowRate(flowTicks, delta);
     unsigned long volume = calculateVolume(rate, delta);
     totalVolume += volume;
+    flowRate = rate;
 
     if(volumeLimit > 0) {
       tempVolume += volume;

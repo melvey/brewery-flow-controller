@@ -82,7 +82,7 @@ void showVolume(unsigned long totalVolume) {
     // Convert microlitres to litres with one decimal point
     col += lcd.print(totalVolume/1000000);
     col += lcd.print(".");
-    col += lcd.print((totalVolume/100000)%1000000);
+    col += lcd.print((totalVolume/10000)%100); // convert to two decimal points
     col += lcd.print("l");
   }
   for(;col < lcdCols; col++) {

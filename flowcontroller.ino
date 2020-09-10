@@ -4,7 +4,7 @@ void openFlow() {
 //    Serial.print("Open flow\n");
     digitalWrite(solenoidPin, HIGH);
     isOpen = true;
-    sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
+    sendStatus(isOpen, flowRate, totalVolume, volumeLimit, tempVolume);
     showVolumeAndStatus(totalVolume, isOpen);
   }
 }
@@ -14,7 +14,7 @@ void closeFlow() {
 //    Serial.print("Close flow\n");
     digitalWrite(solenoidPin, LOW);
     isOpen = false;
-    sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
+    sendStatus(isOpen, flowRate, totalVolume, volumeLimit, tempVolume);
     showVolumeAndStatus(totalVolume, isOpen);
   }
 }

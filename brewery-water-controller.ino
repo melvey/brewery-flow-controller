@@ -11,15 +11,15 @@ const int updateInterval = 1000;
 bool isOpen = false;  // Flag indicating if the solenoid (flow) is open
 // flowmeter
 unsigned long totalVolume = 0; // The total volume of liquid in microlitres that has passed
-double rate = 0;        // Flow rate in litres per hour (I think)
+unsigned long flowRate = 0;        // Smoothed flow rate in ml per hour
 unsigned int volumeLimit = 50000;  // Limit in ml of volume that will flow before it is closed
 unsigned long tempVolume = 0;  // The volume of water that has flowed when tracking the volumeLimit
 
 // Throttling for flow samples
-long lastSampleTime = 0; // The last time the volume was sampled
+unsigned long lastSampleTime = 0; // The last time the volume was sampled
 const int sampleInterval = 300;
 // Throttling for serial reads
-long lastSerialRead = 0;
+unsigned long lastSerialRead = 0;
 long serialReadInterval = 500;
 
 
@@ -41,7 +41,7 @@ void setup() {
   pinMode(flowPin, INPUT);
   loopRunTime = millis(); // A bit moot but it keeps our initial delta accurate
   enableFlow();
-  sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
+  sendStatus(isOpen, flowRate, totalVolume, volumeLimit, tempVolume);
   showVolumeAndStatus(totalVolume, isOpen);
 
 }
@@ -58,12 +58,12 @@ void loop() {
     // Update flow status
     if(updateFlow()) {
       long startT = millis();
-      sendStatus(isOpen, rate, totalVolume, volumeLimit, tempVolume);
+      sendStatus(isOpen, flowRate, totalVolume, volumeLimit, tempVolume);
   
       if(volumeLimit > 0) {
-        showProgressAndFlow(tempVolume, volumeLimit, rate);
+        showProgressAndFlow(tempVolume, volumeLimit, flowRate);
       } else {
-        showVolumeAndFlow(totalVolume, rate);    
+        showVolumeAndFlow(totalVolume, flowRate);    
       }
       lastSampleTime = loopRunTime;
 
