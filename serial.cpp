@@ -1,6 +1,12 @@
+#define byte uint8_t
+#include <stdint.h>
+#include <Arduino.h>
+#include "flowcontroller.h"
+#include "flowmeter.h"
+#include "state.h";
+
 char deviceId[] = "FL01";
 
-char marker = ';';
 char toggleAction[] = "ON"; // Value is 0 or 1
 char setLimitAction[] = "LM"; // Value is the limit in ml
 char turnOnForLimit[] = "LO"; // Value is the limit in ml
@@ -10,6 +16,10 @@ char seperator = 0x3a;
 char startMarker = 0x02;
 char endMarker = 0x03;
 //https://arduino.stackexchange.com/questions/4214/communication-protocol-best-practices-and-patterns
+
+unsigned long lastSerialRead = 0;
+long serialReadInterval = 500;
+
 
 // Format :DDDDAAVVVV:
 // : indicates start/end
@@ -22,22 +32,17 @@ union LongByte
   unsigned long value;
   byte bytes[4];
 };
-union IntByte
-{
-  unsigned int value;
-  byte bytes[4];
-};
-union FloatByte
-{
-  float value;
-  byte bytes[4];
-};
 
 
 /**
 
 */
-void sendStatus(bool isOpen, float rate, unsigned long totalVolume, unsigned int volumeLimit, unsigned long tempVolume) {
+void sendStatus() {
+  unsigned long rate = getRate();
+  unsigned long totalVolume = getTotalVolume();
+  unsigned int volumeLimit = getLimit();
+  unsigned long tempVolume = getCurrentVolume();
+  
   return;
   // format ;DDDDAATTTT12222333344445555;
 
@@ -45,7 +50,7 @@ void sendStatus(bool isOpen, float rate, unsigned long totalVolume, unsigned int
   now.value = millis();
 
 
-  FloatByte rateBytes;
+  LongByte rateBytes;
   rateBytes.value = rate;
 
   LongByte totalVolBytes;
@@ -64,7 +69,7 @@ void sendStatus(bool isOpen, float rate, unsigned long totalVolume, unsigned int
   memcpy(&message[1], &deviceId, 4);
   memcpy(&message[5], &sendDataAction, 2);
   memcpy(&message[7], &now.bytes, 4);
-  message[11] = isOpen ? 1 : 0;
+  message[11] = isOpen() ? 1 : 0;
   memcpy(&message[12], &rateBytes.bytes, 4);
   memcpy(&message[16], &totalVolBytes.bytes, 4);
   memcpy(&message[20], &volLimitBytes.bytes, 4);
@@ -85,7 +90,7 @@ void readSerial() {
     Serial.print("Read: ");
     Serial.print(readByte[0]);
     Serial.print("?!\n");
-    if (readByte[0] == marker && Serial.peek() != marker) {
+    if (readByte[0] == startMarker && Serial.peek() != startMarker) {
       Serial.println("Read on");
       char incomingId[5] = "****\0";
       char incomingAction[3] = "**\0";
@@ -136,4 +141,13 @@ void readSerial() {
   }
   
   lastSerialRead = millis();
+}
+
+bool readSerialThrottled() {
+   if(millis() > lastSerialRead + serialReadInterval) {
+     // Don't read serial and update flow in the same loop - it may take a long time
+     readSerial();
+     return true;
+   }
+   return false;
 }

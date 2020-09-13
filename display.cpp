@@ -1,6 +1,7 @@
-
+#include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
+#include "state.h";
 
 // Construct an LCD object and pass it the 
 // I2C address, width (in characters) and
@@ -19,6 +20,23 @@ int lcdLines = 2;
 
 int line1Display = startMsg;
 int line2Display = startMsg;
+
+void printStartMessage() {
+  // Move the cursor characters to the right and
+  // zero characters down (line 1).
+  lcd.setCursor(4, 0);
+
+  // Print HELLO to the screen, starting at 5,0.
+  lcd.print("Starting");
+
+  // Move the cursor to the next line and print
+  // WORLD.
+  lcd.setCursor(0, 1);      
+  lcd.print("Flow Controller");  
+
+  line1Display = startMsg;
+  line2Display = startMsg;
+}
 
 void setupLCD() {
 
@@ -43,27 +61,12 @@ void clearLCDLine(int line, int startIndex)
   }
 }
 
-void printStartMessage() {
-  // Move the cursor characters to the right and
-  // zero characters down (line 1).
-  lcd.setCursor(4, 0);
-
-  // Print HELLO to the screen, starting at 5,0.
-  lcd.print("Starting");
-
-  // Move the cursor to the next line and print
-  // WORLD.
-  lcd.setCursor(0, 1);      
-  lcd.print("Flow Controller");  
-
-  line1Display = startMsg;
-  line2Display = startMsg;
-}
 
 /**
  * totalVolume: The total volume in microletres that has passed
  */
-void showVolume(unsigned long totalVolume) {
+void showVolume() {
+  unsigned long totalVolume = getTotalVolume();
   // Print first line
   int col = 0;
   if(line1Display != volumeMsg) {
@@ -92,7 +95,7 @@ void showVolume(unsigned long totalVolume) {
   line1Display = volumeMsg;
 }
 
-void showStatus(boolean isOpen) {
+void showStatus() {
   int col = 0;
   lcd.setCursor(0, 1);
   if(line2Display != statusMsg) {
@@ -101,7 +104,7 @@ void showStatus(boolean isOpen) {
     lcd.setCursor(6, 1);    
     col = 6;
   }
-  if(isOpen) {
+  if(isOpen()) {
     col += lcd.print("Open");
   } else {
     col += lcd.print("Closed");
@@ -113,7 +116,8 @@ void showStatus(boolean isOpen) {
   line1Display = statusMsg;  
 }
 
-void showFlowRate(unsigned long rate) {
+void showFlowRate() {
+  unsigned long rate = getRate();
   int col = 0;
   lcd.setCursor(0, 1);
   if(line2Display != rateMsg) {
@@ -136,7 +140,9 @@ void showFlowRate(unsigned long rate) {
   
 }
 
-void showProgress(unsigned long progress, unsigned int limit) {
+void showProgress() {
+  unsigned long progress = getCurrentVolume();
+  unsigned int limit = getLimit();
   // Print first line
   lcd.setCursor(0, 0);
   int col = 0;
@@ -164,19 +170,17 @@ void showProgress(unsigned long progress, unsigned int limit) {
   line1Display = progressMsg;  
 }
 
-void showVolumeAndStatus(unsigned long totalVolume, boolean isOpen) {
-  showVolume(totalVolume);
-  showStatus(isOpen);
+void showVolumeAndStatus() {
+  showVolume();
+  showStatus();
 }
 
-void showVolumeAndFlow(unsigned long totalVolume, unsigned long flow) {
-  showVolume(totalVolume);
-  showFlowRate(flow);
+void showVolumeAndFlow() {
+  showVolume();
+  showFlowRate();
 }
 
-void showProgressAndFlow(unsigned long progress, unsigned int limit, unsigned long flow) {
-  Serial.print("Show progress and flow\n");
-  Serial.print(progress);
-  showProgress(progress, limit);
-  showFlowRate(flow);
+void showProgressAndFlow() {
+  showProgress();
+  showFlowRate();
 }

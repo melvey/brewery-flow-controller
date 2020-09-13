@@ -1,52 +1,24 @@
+#include <Arduino.h>
+#include "state.h"
+#include "flowcontroller.h";
+
+
+const int flowPin = 2; // Should be define
 const int ticksPerCl = 750; // 7.5 ticks per litres per hour
 volatile int flowTicks = 0;
 
-
-void enableFlow() {
-  Serial.print("Track flow\n");
-  flowTicks = 0;
-  attachInterrupt(digitalPinToInterrupt(flowPin), flowTick, CHANGE);
-//  sei();
-}
 
 void flowTick() {
   flowTicks++;
     unsigned long now = millis();
 }
 
-boolean updateFlow() {
-  if(flowTicks > 0) {
-    unsigned long now = millis();
-    unsigned long delta = now - lastSampleTime;
-
-    unsigned long rate = calculateFlowRate(flowTicks, delta);
-    unsigned long volume = calculateVolume(rate, delta);
-    totalVolume += volume;
-    flowRate = rate;
-
-    if(volumeLimit > 0) {
-      tempVolume += volume;
-    }
-
-    if(tempVolume >= volumeLimit) {
-      closeFlow();
-      tempVolume = 0;
-      volumeLimit = 0;
-    }
-    flowTicks = 0;
-    return true;
-  }
-  return false;
-}
-
-void turnOffAfter(unsigned int targetVolume) {
-  Serial.print("Target: ");
-  Serial.print(targetVolume);
-  volumeLimit = 10000;
-  Serial.print("\nLimit: ");
-  Serial.print(volumeLimit);
-  Serial.print("\n");
-  tempVolume = 0;
+void enableFlow() {
+  Serial.print("Track flow\n");
+  pinMode(flowPin, INPUT);
+  flowTicks = 0;
+  attachInterrupt(digitalPinToInterrupt(flowPin), flowTick, CHANGE);
+//  sei();
 }
 
 
@@ -75,7 +47,37 @@ unsigned long calculateVolume(unsigned long flowRate, unsigned long delta) {
     return volume;
 }
 
+boolean updateFlow() {
+  if(flowTicks > 0) {
+    unsigned long now = millis();
+    unsigned long delta = now - getLastSampleTime();
 
-void resetVolume() {
-  totalVolume = 0;
+    unsigned long rate = calculateFlowRate(flowTicks, delta);
+    unsigned long volume = calculateVolume(rate, delta);
+    addVolume(volume);
+    setRate(rate);
+
+    if(getLimit() > 0) {
+      addVolume(volume);
+    }
+
+    if(getCurrentVolume() >= getLimit()) {
+      closeFlow();
+      resetVolume();
+      //setLimit(0);
+    }
+    flowTicks = 0;
+    return true;
+  }
+  return false;
+}
+
+void turnOffAfter(unsigned int targetVolume) {
+  Serial.print("Target: ");
+  Serial.print(targetVolume);
+  setLimit(10000);
+  Serial.print("\nLimit: ");
+  Serial.print(getLimit());
+  Serial.print("\n");
+  resetVolume();
 }

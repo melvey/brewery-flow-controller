@@ -1,11 +1,25 @@
+#include <Arduino.h>
+#include "state.h";
+#include "serial.h";
+#include "display.h";
+
+const int solenoidPin = 4;
+const int valveOpenPin = 5;
+const int valveClosePin = 6;
+
+
+void enableSolenoid() {
+  pinMode(solenoidPin, OUTPUT);
+}
+
 
 void openFlow() {
   if(isOpen == false) {
 //    Serial.print("Open flow\n");
     digitalWrite(solenoidPin, HIGH);
-    isOpen = true;
-    sendStatus(isOpen, flowRate, totalVolume, volumeLimit, tempVolume);
-    showVolumeAndStatus(totalVolume, isOpen);
+    setOpen(true);
+    sendStatus();
+    showVolumeAndStatus();
   }
 }
 
@@ -13,9 +27,9 @@ void closeFlow() {
   if(isOpen == true) {
 //    Serial.print("Close flow\n");
     digitalWrite(solenoidPin, LOW);
-    isOpen = false;
-    sendStatus(isOpen, flowRate, totalVolume, volumeLimit, tempVolume);
-    showVolumeAndStatus(totalVolume, isOpen);
+    setOpen(false);
+    sendStatus();
+    showVolumeAndStatus();
   }
 }
 
