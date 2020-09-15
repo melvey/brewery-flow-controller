@@ -1,9 +1,8 @@
 #include <Arduino.h>
-
-#include "serial.h"
 #include "state.h"
-#include "flowmeter.h";
+#include "serial.h"
 #include "display.h"
+#include "flowmeter.h";
 #include "button.h";
 
 const int updateInterval = 1000;
@@ -20,21 +19,23 @@ float loopRunTime = 0;
 void setup() {
   // put your setup code here, to run once:
   randomSeed(analogRead(0));
-  Serial.begin(9600);
-  setupLCD();
+  Serial.begin(115200);
   Serial.print("Starting ");
   Serial.print(random(100));
   Serial.print("\n");
-
+  setupLCD();
+  Serial.print("LCD setup \n");
+/*
   setupButton();
   loopRunTime = millis(); // A bit moot but it keeps our initial delta accurate
   enableFlow();
   sendStatus();
   showVolumeAndStatus();
-
+*/
 }
 
 void loop() {
+  /*
    float oldTime = loopRunTime;
    loopRunTime = millis();
    float deltaTime = loopRunTime - oldTime;
@@ -61,4 +62,5 @@ void loop() {
       readSerialThrottled();
     }
   }
+  */
 }
