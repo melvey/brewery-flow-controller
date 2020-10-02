@@ -1,7 +1,10 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 #include <Wire.h>
-#include "state.h";
+#include "state.h"
+
+
+#define I2C_ADDR  0x27
 
 // Construct an LCD object and pass it the 
 // I2C address, width (in characters) and
@@ -39,7 +42,7 @@ void printStartMessage() {
 }
 
 void setupLCD() {
-  lcd = new LiquidCrystal_I2C (0x27, 16, 2);
+  lcd = new LiquidCrystal_I2C (I2C_ADDR, 16, 2);
   // The begin call takes the width and height. This
   // Should match the number provided to the constructor.
   lcd->begin(lcdCols, lcdLines);

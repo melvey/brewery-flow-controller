@@ -43,12 +43,10 @@ void sendStatus() {
   unsigned int volumeLimit = getLimit();
   unsigned long tempVolume = getCurrentVolume();
   
-  return;
   // format ;DDDDAATTTT12222333344445555;
 
   LongByte now;
   now.value = millis();
-
 
   LongByte rateBytes;
   rateBytes.value = rate;

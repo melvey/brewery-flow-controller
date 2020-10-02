@@ -3,20 +3,20 @@
 #include "serial.h";
 #include "display.h";
 
-const int solenoidPin = 4;
-const int valveOpenPin = 5;
-const int valveClosePin = 6;
+#define SOLENOID_PIN 4
+#define VALVE_OPEN_PIN 5
+#define VALVE_CLOSE_PIN 6
 
 
 void enableSolenoid() {
-  pinMode(solenoidPin, OUTPUT);
+  pinMode(SOLENOID_PIN, OUTPUT);
 }
 
 
 void openFlow() {
   if(isOpen == false) {
 //    Serial.print("Open flow\n");
-    digitalWrite(solenoidPin, HIGH);
+    digitalWrite(SOLENOID_PIN, HIGH);
     setOpen(true);
     sendStatus();
     showVolumeAndStatus();
@@ -26,7 +26,7 @@ void openFlow() {
 void closeFlow() {
   if(isOpen == true) {
 //    Serial.print("Close flow\n");
-    digitalWrite(solenoidPin, LOW);
+    digitalWrite(SOLENOID_PIN, LOW);
     setOpen(false);
     sendStatus();
     showVolumeAndStatus();
@@ -43,11 +43,11 @@ void toggleFlow() {
 
 
 void openValve() {
-  analogWrite(valveOpenPin, 0);
-  analogWrite(valveClosePin, 255);
+  analogWrite(VALVE_OPEN_PIN, 0);
+  analogWrite(VALVE_CLOSE_PIN, 255);
 }
 
 void closeValve() {
-  analogWrite(valveClosePin, 0);
-  analogWrite(valveOpenPin, 255);
+  analogWrite(VALVE_CLOSE_PIN, 0);
+  analogWrite(VALVE_OPEN_PIN, 255);
 }

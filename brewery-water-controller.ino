@@ -25,17 +25,14 @@ void setup() {
   Serial.print("\n");
   setupLCD();
   Serial.print("LCD setup \n");
-/*
   setupButton();
   loopRunTime = millis(); // A bit moot but it keeps our initial delta accurate
   enableFlow();
   sendStatus();
   showVolumeAndStatus();
-*/
 }
 
 void loop() {
-  /*
    float oldTime = loopRunTime;
    loopRunTime = millis();
    float deltaTime = loopRunTime - oldTime;
@@ -59,8 +56,7 @@ void loop() {
       
        long endT = millis();
     } else {
-      readSerialThrottled();
+       readSerialThrottled();
     }
   }
-  */
 }

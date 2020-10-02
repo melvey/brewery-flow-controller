@@ -1,16 +1,21 @@
 #include <Arduino.h>
 #include "flowcontroller.h";
 
-const float holdTime = 500;
-
-const int buttonPin = 3;
+#define BUTTON_PIN  3
+#define HOLD_TIME   500
 
 int holding = 0;
-float pressStart = 0;
-float lastPress = 0;
+unsigned long pressStart = 0;
+unsigned long lastPress = 0;
 
 void setupButton() {
-  pinMode(buttonPin, INPUT);
+  pinMode(BUTTON_PIN, INPUT);
+}
+
+void startHold() {
+  Serial.print("Start hold");
+  openFlow();
+  openValve();  
 }
 
 void onHold() {
@@ -20,31 +25,28 @@ void onHold() {
 }
 
 void onRelease() {
-//  Serial.print("Released");
+  Serial.print("Release");
   closeFlow();
   closeValve();
 }
 
 void onTap() {
+  Serial.print("Tap");
 //  turnOffAfter(50000);
   toggleFlow();
 }
 
 
 void handleButtonPress() {
-  int buttonState = digitalRead(buttonPin);
-  float now = millis();
+  int buttonState = digitalRead(BUTTON_PIN );
+  unsigned long now = millis();
   if(buttonState == LOW) {
-    float now = millis();
     
     if(pressStart == 0) {
       pressStart = now;
     }
     
-    if(now - pressStart > holdTime) {
-//      Serial.print("Holding:");
-//      Serial.print(now - pressStart);
- //     Serial.print("\n");
+    if(now - pressStart > HOLD_TIME) {
       holding = 1;
       onHold();
     }
