@@ -19,6 +19,7 @@ void USART_WriteUnsignedChar(unsigned char number);
 void USART_WriteUnsignedInt(unsigned int number);
 void USART_WriteSignedInt(int number);
 unsigned char USART_Receive(void);
+unsigned int USART_Ready(void);
 void USART_Flush(void);
 
 #endif // __USART_H__

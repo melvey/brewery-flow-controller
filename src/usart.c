@@ -11,12 +11,12 @@ void USART_Init(void)
 {
 	// Set Baud Rate to 1 Mbps (16 MHz Clock Rate)
 	UBRR0H = 0;
-	UBRR0L = 1;			// From PG. 199 of the ATMega328s Manual
+	//UBRR0L = 1;			// From PG. 199 of the ATMega328s Manual
 	//UBRR0L = 3;				// 500 kbps
     //UBRR0L = 7;				// 250 kbps
     //UBRR0L = 25;				// 76.8 kbps
     //UBRR0L = 34;				// 57.6 kbps
-    //UBRR0L = 207;				// 96 kbps
+    UBRR0L = 207;				// 96 kbps
 
 
 	// High Speed Mode ON
@@ -26,7 +26,7 @@ void USART_Init(void)
 	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
 	
 	// Enable received data interupt
-	UCSR0B |= (1 << RXCIE0);
+	//UCSR0B |= (1 << RXCIE0);
 }
 
 void USART_Write(unsigned char data)
@@ -121,6 +121,14 @@ unsigned char USART_Receive(void)
 	
 	// Get and retrun received data from buffer
 	return UDR0;
+}
+
+unsigned int USART_Ready(void) {
+	if (UCSR0A & (1 << RXC0)) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 void USART_Flush(void)
