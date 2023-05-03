@@ -30,14 +30,12 @@ function setTotal(serialPort, ml) {
 	serialPort.write(buff);
 }
 
-
-function sendBufferWithDelay(serialPort, buffer, index, delay) {
+// Send buffer one character at a time
+function sendBufferWithDelay(serialPort, buffer, delay) {
     console.log('Sending buffer with delay', buffer);
-  if (index >= buffer.length) return;
-
-  serialPort.write(buffer.slice(index, index + 1), () => {
-    setTimeout(() => sendBufferWithDelay(serialPort, buffer, index + 1, delay), delay);
-  });
+    for (let i = 0; i < buffer.length; i++) {
+        setTimeout(() => serialPort.write(buffer.slice(i, i + 1)), i * delay);
+    }
 }
 
 
@@ -89,8 +87,8 @@ SerialPort.list().then((devices) => {
 	});
 
     const bufferToSend = Buffer.from([0x02, 0x46, 0x31, 0x54, 0x88, 0x13, 0x00, 0x00, 0x03]);
-    sendBufferWithDelay(serialPort, bufferToSend, 0, 10); // You can adjust the delay as needed
-    setTimeout(() => sendBufferWithDelay(serialPort, bufferToSend, 0, 10), 5000);
+    //sendBufferWithDelay(serialPort, bufferToSend, 10); // You can adjust the delay as needed
+    setTimeout(() => sendBufferWithDelay(serialPort, bufferToSend, 30), 5000);
 	//setTimeout(() => setTotal(serialPort, 5000), 5000);
 
     let receivedData = Buffer.alloc(0);

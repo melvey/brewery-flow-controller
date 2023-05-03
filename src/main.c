@@ -46,6 +46,12 @@ unsigned long lastDebounceTime = 0;
 uint8_t lastButtonState = 0;
 uint8_t buttonState = 0;
 
+// A debugging buffer to check which data is being read from serial
+// This can be deleted after debugging as the key information is in serialBuffer
+char tmpBuffer[SERIAL_BUFFER_SIZE];
+int tmpBufferIndex = 0;
+
+
 void toHexString(char *dest, const char *src, size_t len) {
     for (size_t i = 0; i < len; i++) {
         snprintf(dest + i * 2, 3, "%02X", (uint8_t)src[i]);
@@ -94,41 +100,46 @@ ISR(TIMER0_OVF_vect){
 }
 
 void readInput(void) {
+    // track status of read to avoid writing while reading
+    // This should later be split off to be the return value of a processCommand function
+    int status = 0;
+    tmpBufferIndex = 0;
     char readChar;
     while (USART_Ready() == 1) {
         readChar = USART_Receive();
-        USART_Write(readChar);
+
+
+        if(tmpBufferIndex < SERIAL_BUFFER_SIZE) {
+            tmpBuffer[tmpBufferIndex] = readChar;
+            tmpBufferIndex++;
+        } else {
+            tmpBufferIndex = 0;
+        }
+
+
         if (readChar == SERIAL_START) {
             serialBuffer[0] = readChar;
             bufferIndex = 1;
         } else if (readChar == SERIAL_END) {
                 // Check for ETX character
                 // If the device ID matches and the command and length are correct, update the target volume
-                char receivedDeviceIdHex[SERIAL_DEVICE_LENGTH * 2 + 1] = {0}; // Allocate space for hexadecimal string representation
-                toHexString(receivedDeviceIdHex, serialBuffer + SERIAL_DEVICE_INDEX, SERIAL_DEVICE_LENGTH);
-                sendMessage(receivedDeviceIdHex);
-
-                sendMessage("Endchar");
-
-                for (uint8_t i = 0; i < bufferIndex; i++) {
-                    char message[4];
-                    snprintf(message, sizeof(message), "%02X ", serialBuffer[i]);
-                    sendMessage(message);
-                }
-
+                status = 1;
 
                 if (strncmp(serialBuffer + SERIAL_DEVICE_INDEX, DEVICE_ID, SERIAL_DEVICE_LENGTH) == 0) {
-                    sendMessage("Device ID matches");
+                    status = 2;
                     if(serialBuffer[SERIAL_CMD_INDEX] == SERIAL_SET_TARGET_CMD) {
                         // Check this is the correct message length and either process the command or wait for another end char
                         if(bufferIndex == SERIAL_SET_TARGET_CMD_LENGTH) {
+                            status = 3;
                             sendMessage("Got set target command");
                         } else {
+                            status = 4;
                             serialBuffer[bufferIndex] = readChar;
                             bufferIndex++;
                         }
                     }
                 } else {
+                    status = 5;
                     //sendMessage("Invalid device id");
 
                     char deviceId[SERIAL_DEVICE_LENGTH];
@@ -137,10 +148,6 @@ void readInput(void) {
                     char message[msgLength];
                     snprintf(message, msgLength, "invalid DeviceID %s", deviceId);
                     //sendMessage(message);
-
-                    for(int i = 0; i <= bufferIndex; i++) {
-                        USART_Write(serialBuffer[i]);
-                    }
                 }
                 
                 // Reset the buffer index
@@ -151,10 +158,35 @@ void readInput(void) {
             // Reset the buffer index if it exceeds the buffer size
             if (bufferIndex >= SERIAL_BUFFER_SIZE) {
                 bufferIndex = 0;
-                sendMessage("buffer exceeded");
+                status = 6;
+                //sendMessage("buffer exceeded");
             }
         }
     }
+
+/*
+    if(status == 0) {
+        sendMessage("No data");
+    } else if(status == 1) {
+        sendMessage("got end char");
+    } else if(status == 2) {
+        sendMessage("Device ID matches");
+    } else if(status == 3) {
+        sendMessage("set volume cmd");
+    } else if(status == 4) {
+        sendMessage("false end in set volume");
+    } else if(status == 5) {
+        sendMessage("Invalid device id");
+    } else if(status == 6) {
+        sendMessage("Buffer exceeded");
+    }
+    */
+
+    // return data in tmp buffer
+    for(int i = 0; i < tmpBufferIndex; i++) {
+        USART_Write(tmpBuffer[i]);
+    }
+    
 }
 void configureTimer0(void) {
     //Set Timer 0 to normal mode, 1/1024 prescaler
