@@ -7,8 +7,8 @@ const SERIAL_MESSAGE_LENGTH = 25;
 
 const SERIAL_MSG_CMD = 'M';
 const port = '/dev/ttyUSB0';
-const baudRate = 9600;
-//const baudRate = 1000000;
+//const baudRate = 9600;
+const baudRate = 1000000;
 const deviceSerial = 'A956RV8A';
 
 const deviceId = 'F1';
@@ -28,6 +28,7 @@ function setTotal(serialPort, ml) {
 	buff.write(serialEnd, 8, 1, 'hex');
 	console.log('Sending', buff);
 	serialPort.write(buff);
+	//sendBufferWithDelay(serialPort, buff, 50);
 }
 
 // Send buffer one character at a time
@@ -86,15 +87,14 @@ SerialPort.list().then((devices) => {
 		console.error('error', err);
 	});
 
-    const bufferToSend = Buffer.from([0x02, 0x46, 0x31, 0x54, 0x88, 0x13, 0x00, 0x00, 0x03]);
-    //sendBufferWithDelay(serialPort, bufferToSend, 10); // You can adjust the delay as needed
-    setTimeout(() => sendBufferWithDelay(serialPort, bufferToSend, 30), 5000);
-	//setTimeout(() => setTotal(serialPort, 5000), 5000);
+    //const bufferToSend = Buffer.from([0x02, 0x46, 0x31, 0x54, 0x88, 0x13, 0x00, 0x00, 0x03]);
+    //setTimeout(() => sendBufferWithDelay(serialPort, bufferToSend, 30), 5000);
+	setTimeout(() => setTotal(serialPort, 5000), 5000);
 
     let receivedData = Buffer.alloc(0);
 
     serialPort.on('data', (data) => {
-        console.log('data', data);
+        console.log('recieved', data);
         receivedData = Buffer.concat([receivedData, data]);
 
         let startCharIndex = receivedData.indexOf(SERIAL_START);

@@ -22,4 +22,6 @@ unsigned char USART_Receive(void);
 unsigned int USART_Ready(void);
 void USART_Flush(void);
 
+unsigned int USART_HasOverflow(void);
+void USART_ClearOverflow(void);
 #endif // __USART_H__

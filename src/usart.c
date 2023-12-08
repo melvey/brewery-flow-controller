@@ -7,16 +7,25 @@
 // usart.c
 // *********************************************************************************
 
+#define BUFFER_SIZE 64
+
+unsigned char serial_buffer[BUFFER_SIZE];
+unsigned int write_index = 0;
+unsigned int read_index = 0;
+unsigned int buffer_overflow = TRUE;
+
+
 void USART_Init(void)
 {
 	// Set Baud Rate to 1 Mbps (16 MHz Clock Rate)
 	UBRR0H = 0;
-	//UBRR0L = 1;			// From PG. 199 of the ATMega328s Manual
+	UBRR0L = 1;			// From PG. 199 of the ATMega328s Manual
+	// Alternate baud rate settings for future reference
 	//UBRR0L = 3;				// 500 kbps
     //UBRR0L = 7;				// 250 kbps
     //UBRR0L = 25;				// 76.8 kbps
     //UBRR0L = 34;				// 57.6 kbps
-    UBRR0L = 207;				// 96 kbps
+    //UBRR0L = 207;				// 96 kbps
 
 
 	// High Speed Mode ON
@@ -26,8 +35,30 @@ void USART_Init(void)
 	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
 	
 	// Enable received data interupt
-	//UCSR0B |= (1 << RXCIE0);
+	UCSR0B |= (1 << RXCIE0);
 }
+
+ISR(USART_RX_vect)
+{
+    // Read the recieved data
+    unsigned char data = UDR0;
+
+    // Calculate the next write index
+    unsigned char next_write_index = (write_index + 1) % BUFFER_SIZE;
+
+    //USART_Write(data);
+
+    // Store the data in the buffer if it is not full
+    if (next_write_index != read_index)
+    {
+        serial_buffer[write_index] = data;
+        write_index = next_write_index;
+    } else {
+        buffer_overflow = TRUE;
+    }
+}
+    
+
 
 void USART_Write(unsigned char data)
 {
@@ -58,7 +89,6 @@ void USART_WriteCRLF(void)
 
 void USART_WriteUnsignedChar(unsigned char number)
 {
-	unsigned char write_data = FALSE;
 	// This number is at most 255 (3 digits)
 	unsigned char ones = number % 10;
 	number /= 10;
@@ -66,11 +96,15 @@ void USART_WriteUnsignedChar(unsigned char number)
 	number /= 10;
 	unsigned char hundreds = number % 10;
 	
-	if (hundreds > 0) write_data = TRUE;
-	if (write_data) USART_Write('0' + hundreds);
-	if (tens > 0) write_data = TRUE;
-	if (write_data) USART_Write('0' + tens);
-	USART_Write('0' + ones);
+    if (hundreds > 0) 
+    {
+        USART_Write('0' + hundreds);
+    }
+    if (hundreds > 0 || tens > 0) 
+    {
+        USART_Write('0' + tens);
+    }
+    USART_Write('0' + ones);
 }
 
 void USART_WriteUnsignedInt(unsigned int number)
@@ -116,18 +150,28 @@ void USART_WriteSignedInt(int number)
 
 unsigned char USART_Receive(void)
 {
-	// Wait for data to be received
-	while (!(UCSR0A & (1 << RXC0)));
-	
-	// Get and retrun received data from buffer
-	return UDR0;
+    // If the buffer is empty do not do anything
+    if (read_index == write_index)
+    {
+        return 0;
+    }
+
+    // Read the data from the buffer
+    unsigned char data = serial_buffer[read_index];
+
+    // Calculate the next read index
+    read_index = (read_index + 1) % BUFFER_SIZE;
+
+    return data;
+
 }
 
 unsigned int USART_Ready(void) {
-	if (UCSR0A & (1 << RXC0)) {
-		return 1;
+    if (read_index == write_index)
+    {
+		return FALSE;
 	} else {
-		return 0;
+		return TRUE;
 	}
 }
 
@@ -137,4 +181,12 @@ void USART_Flush(void)
 	
 	while (UCSR0A & (1 << RXC0))
 		dummy = UDR0;
+}
+
+unsigned int USART_HasOverflow(void) {
+    return buffer_overflow;
+}
+
+void USART_ClearOverflow(void) {
+    buffer_overflow = FALSE;
 }
