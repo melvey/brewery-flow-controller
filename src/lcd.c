@@ -1,5 +1,6 @@
+#include "lcdpcf8574.h"
 
-void displayVolume(void) {
+void displayVolume(unsigned long volume) {
 	lcd_gotoxy(1, 0);
 	char tmp[21];
 	lcd_puts("Vol:");

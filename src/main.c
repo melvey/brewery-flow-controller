@@ -4,9 +4,9 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "usart.h"
-#include "lcdpcf8574.h"
 #include "ioFunctions.h"
 #include "flow.h"
+#include "lcd.h"
 
 #define ENABLE_LCD 1
 
@@ -117,6 +117,7 @@ int main(void) {
     sei();
 
     sendMessage("Starting");
+    setupLCD();
     serialUpdate();
     while(1) {
         readInput();
@@ -125,6 +126,7 @@ int main(void) {
 			updateTicks = 0;
 			updateVolume(newTicks);
             serialUpdate();
+            displayVolume(getVolume());
 
         }
 
