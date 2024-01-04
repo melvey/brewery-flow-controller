@@ -116,6 +116,8 @@ int main(void) {
 
     sei();
 
+    openFlow();
+
     sendMessage("Starting");
     setupLCD();
     serialUpdate();
@@ -126,7 +128,7 @@ int main(void) {
 			updateTicks = 0;
 			updateVolume(newTicks);
             serialUpdate();
-            displayVolume(getVolume());
+            displayVolume(getVolume(), getFlowRate());
 
         }
 

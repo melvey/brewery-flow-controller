@@ -1,6 +1,7 @@
+#include <stdio.h>
 #include "lcdpcf8574.h"
 
-void displayVolume(unsigned long volume) {
+void displayVolume(unsigned long volume, unsigned long flowRate) {
 	lcd_gotoxy(1, 0);
 	char tmp[21];
 	lcd_puts("Vol:");
@@ -8,9 +9,9 @@ void displayVolume(unsigned long volume) {
 	ultoa(volume, tmp, 10);
 	lcd_puts(tmp);
 	lcd_gotoxy(1, 1);
-	lcd_puts("Ticks:");
+	lcd_puts("Rate:");
 	lcd_gotoxy(7, 1);
-	utoa(oldTicks, tmp, 10);
+	ultoa(flowRate, tmp, 10);
 	lcd_puts(tmp);
 }
 
