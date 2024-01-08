@@ -1,7 +1,13 @@
 #include "flow.h"
 #include "ioFunctions.h"
 
-const int SOLENOID_PIN = PINB1;
+
+/*
+const int VALVE_OPEN_REGISTER = OCR2B; // D3
+const int VALVE_CLOSE_REGISTER = OCR2A; // D11 PWA
+*/
+
+const int SOLENOID_PIN = PINB1; // D9
 unsigned int ticks = 0;
 unsigned long flowRate = 0;
 unsigned long volume = 0;
@@ -12,11 +18,17 @@ int flowStatus = 0;
 void openFlow(void) {
 	flowStatus = 1;
 	PORTB = PORTB | (1<<SOLENOID_PIN); // Write high value to SOLENOID PIN (digitalWrite)
+
+    OCR2B = 0;
+    OCR2A = 128;
 }
 
 void closeFlow(void) {
 	flowStatus = 0;
 	PORTB = PORTB & (0<<SOLENOID_PIN); // Write low value to SOLENOID PIN (digitalWrite)
+
+    OCR2B = 128;
+    OCR2A = 0;
 }
 
 

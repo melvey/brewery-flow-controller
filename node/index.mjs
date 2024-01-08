@@ -58,7 +58,7 @@ function processData(data) {
             console.log({ device, cmd, flow, volume, ticks, target, open });
             if (target <= volume) {
                 console.log('Get another litre');
-                setTimeout(() => setTotal(serialPort, target + 1000), 5000);
+                //setTimeout(() => setTotal(serialPort, target + 1000), 5000);
             }
         }
     }
@@ -89,7 +89,7 @@ SerialPort.list().then((devices) => {
 
     //const bufferToSend = Buffer.from([0x02, 0x46, 0x31, 0x54, 0x88, 0x13, 0x00, 0x00, 0x03]);
     //setTimeout(() => sendBufferWithDelay(serialPort, bufferToSend, 30), 5000);
-	setTimeout(() => setTotal(serialPort, 5000), 5000);
+	setTimeout(() => setTotal(serialPort, 20000), 5000);
 
     let receivedData = Buffer.alloc(0);
 

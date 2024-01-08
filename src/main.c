@@ -75,7 +75,8 @@ void configureTimer2(void) {
 
 void setupPinModes(void) {
 	DDRB |= 0b00001010;//set PORTB so that D9 & D11 are outputs
-	DDRD = 0b00001010; //set PORTD so that D1 & D3 are outputs, D0, D2, D4-D7 are inputs
+	DDRD |= 0b00001010; //set PORTD so that D1 & D3 are outputs, D0, D2, D4-D7 are inputs
+	//DDRD |= 0b00000010; //set PORTD so that D1 & D3 are outputs, D0, D2, D4-D7 are inputs
 }
 
 
